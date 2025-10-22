@@ -1,0 +1,72 @@
+# Audio Prompt Template — ElevenLabs
+
+**Platform:** ElevenLabs  
+**Use Case:** Voice synthesis, sound effects (if supported)  
+**Template Version:** 1.0
+
+---
+
+## Template (Voice Synthesis)
+
+```
+{{voice_description}}: "{{script}}"
+
+[Style: {{style}}]
+[Emotion: {{emotion}}]
+[Pace: {{pace}}]
+```
+
+---
+
+## Variables
+
+- **voice_description**: Voice characteristics (e.g., "Mature male narrator", "Young female character")
+- **script**: Actual text to synthesize
+- **style**: Delivery style (e.g., "conversational", "dramatic narration", "storytelling")
+- **emotion**: Emotional tone (e.g., "neutral", "excited", "somber", "mysterious")
+- **pace**: Speech rate (e.g., "normal", "slow", "fast")
+
+---
+
+## Example Output (Fantasy Narrator)
+
+**User Input:**
+- Use Case: Audio narration for fantasy pack
+- Voice: Mature male
+- Emotion: Mysterious
+
+**Generated Prompt:**
+```
+Mature male narrator with deep, resonant voice: "In the depths of the ancient forest, where shadows dance and dragons slumber, a legend awakens."
+
+[Style: Dramatic Storytelling]
+[Emotion: Mysterious, Epic]
+[Pace: Slow and deliberate]
+```
+
+---
+
+## Usage Notes
+
+- ElevenLabs excels at voice synthesis, not music/SFX
+- Choose voice model from ElevenLabs library or clone custom voice
+- For POD assets, use royalty-free voices or ensure commercial license
+- Keep scripts concise for sound bites (<30 seconds ideal)
+- Specify pronunciation for uncommon words: `dragon [DRAG-on]`
+- Use SSML for advanced control (pauses, emphasis)
+
+---
+
+## SSML Example (Advanced)
+
+```xml
+<speak>
+  <prosody rate="slow" pitch="-2st">
+    In the depths of the ancient forest,
+  </prosody>
+  <break time="500ms"/>
+  <prosody rate="normal" volume="loud">
+    a legend awakens!
+  </prosody>
+</speak>
+```

@@ -1,0 +1,73 @@
+# Image Prompt Template — MidJourney
+
+**Platform:** MidJourney  
+**Version:** v6 (adaptable for v5/v7)  
+**Template Version:** 1.0
+
+---
+
+## Template
+
+```
+{{subject}}, {{style}}, {{mood}}, {{composition}}, {{lighting}}, {{details}} --ar {{aspect_ratio}} --v {{version}} --style {{style_mode}}
+```
+
+---
+
+## Variables
+
+- **subject**: Main subject
+- **style**: Art style descriptor
+- **mood**: Emotional tone
+- **composition**: Camera angle/framing
+- **lighting**: Lighting setup
+- **details**: Additional quality modifiers
+- **aspect_ratio**: e.g., `16:9`, `1:1`, `4:5` (default: `1:1`)
+- **version**: MidJourney version (e.g., `6`, `5.2`)
+- **style_mode**: `raw` (photorealistic) | `expressive` | `cute` (default: `raw`)
+
+---
+
+## Parameter Reference
+
+**Aspect Ratios:**
+- `1:1` — Square (social media)
+- `16:9` — Landscape (desktop wallpaper)
+- `9:16` — Portrait (phone wallpaper)
+- `4:5` — Instagram portrait
+- `5:4` — Print standard
+
+**Style Modes (v6):**
+- `--style raw` — Photorealistic, less stylized
+- `--style expressive` — More artistic interpretation
+- `--style cute` — Kawaii/playful aesthetic
+
+**Quality/Detail:**
+- `--q 2` — High quality (2x rendering time)
+- `--chaos 50` — More varied results (0-100)
+- `--weird 500` — Experimental aesthetics (0-3000)
+
+---
+
+## Example Output (Fantasy Dragon)
+
+**User Input:**
+- Theme: Fantasy
+- Subject: Dragon
+- Style: Epic
+- Aspect: 16:9
+
+**Generated Prompt:**
+```
+majestic dragon breathing fire over medieval castle, epic fantasy art, dark dramatic atmosphere, cinematic wide angle shot, volumetric lighting with glowing embers, highly detailed scales and architecture, 8k quality --ar 16:9 --v 6 --style raw
+```
+
+---
+
+## Usage Notes
+
+- MidJourney v6 understands natural language better than v5
+- Use `--style raw` for POD assets (more realistic, less MJ "house style")
+- Keep subject at the beginning for best results
+- Avoid negative prompts (MidJourney doesn't support `--no` well in v6)
+- Use `--seed` for reproducibility: `--seed 123456`

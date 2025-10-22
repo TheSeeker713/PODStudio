@@ -1,0 +1,63 @@
+# Video Prompt Template — Kling AI
+
+**Platform:** Kling AI  
+**Model:** Kling v1.5  
+**Template Version:** 1.0
+
+---
+
+## Template
+
+```
+{{subject}}, {{action}}, {{setting}}, {{camera_movement}}, {{style}}, {{duration}}
+```
+
+---
+
+## Variables
+
+- **subject**: Main subject (e.g., "dragon", "medieval knight", "spaceship")
+- **action**: What's happening (e.g., "flying through clouds", "charging into battle")
+- **setting**: Environment (e.g., "over snowy mountains", "in a dark forest", "in space")
+- **camera_movement**: Camera motion (e.g., "slow pan", "tracking shot", "static", "drone fly-through")
+- **style**: Visual style (e.g., "cinematic", "realistic", "fantasy art style")
+- **duration**: Target length (e.g., "5 seconds", "loop", "10 seconds")
+
+---
+
+## Camera Movement Options
+
+- **static**: Fixed camera
+- **pan left/right**: Horizontal movement
+- **tilt up/down**: Vertical movement
+- **tracking shot**: Following subject
+- **dolly in/out**: Camera moving toward/away
+- **aerial/drone shot**: Bird's eye view
+- **orbit**: Circular movement around subject
+
+---
+
+## Example Output (Dragon Flight)
+
+**User Input:**
+- Theme: Fantasy
+- Subject: Dragon
+- Action: Flying
+- Duration: 5 seconds
+
+**Generated Prompt:**
+```
+majestic red dragon flying through stormy clouds, powerful wing beats, over medieval castle at sunset, cinematic tracking shot following dragon's flight path, epic fantasy style, highly detailed scales and atmosphere, 5 seconds, seamless loop
+```
+
+---
+
+## Usage Notes
+
+- Kling AI works best with clear action descriptions
+- Specify "seamless loop" for game/background use
+- Keep prompts under 150 words
+- Camera movement significantly affects output quality
+- For POD assets, prefer "cinematic" or "realistic" styles
+- Avoid too many simultaneous actions (split into multiple clips)
+- Request "establishing shot" for scene-setters

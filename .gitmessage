@@ -1,0 +1,23 @@
+# Conventional Commit Template
+# https://www.conventionalcommits.org/
+#
+# Format:
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+#
+# Types: feat, fix, docs, style, refactor, perf, test, chore
+# Scope: ui, backend, worker, core, cli, docs, ci
+# Subject: imperative, lowercase, no period at end
+# Body: explain WHAT and WHY (not HOW)
+# Footer: reference issues (Closes #123, Fixes #456)
+
+# Example:
+# feat(ui): add collapsible dock panels
+#
+# Implement QDockWidget-based layout with user-configurable
+# dock positions and visibility toggles.
+#
+# Closes #42

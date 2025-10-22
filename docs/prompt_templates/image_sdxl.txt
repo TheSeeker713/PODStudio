@@ -1,0 +1,67 @@
+# Image Prompt Template — SDXL
+
+**Platform:** Stable Diffusion XL  
+**Model:** SDXL Base 1.0  
+**Template Version:** 1.0
+
+---
+
+## Template
+
+```
+{{subject}}, {{style}}, {{mood}}, {{composition}}, {{lighting}}, {{details}}
+```
+
+---
+
+## Variables
+
+- **subject**: Main subject of the image (e.g., "majestic dragon", "medieval castle")
+- **style**: Art style (e.g., "fantasy art", "photorealistic", "digital painting")
+- **mood**: Emotional tone (e.g., "epic", "serene", "dark", "whimsical")
+- **composition**: Framing (e.g., "wide angle", "close-up portrait", "aerial view")
+- **lighting**: Lighting description (e.g., "golden hour sunset", "dramatic shadows", "soft diffused light")
+- **details**: Additional modifiers (e.g., "highly detailed", "8k resolution", "cinematic")
+
+---
+
+## Negative Prompt Template
+
+```
+{{negative_style}}, {{negative_quality}}, {{negative_artifacts}}
+```
+
+Default negatives:
+- **negative_style**: "cartoon, anime, low-poly, sketch" (if photorealistic desired)
+- **negative_quality**: "blurry, low quality, jpeg artifacts, watermark"
+- **negative_artifacts**: "deformed, distorted, extra limbs, text, signature"
+
+---
+
+## Example Output (Fantasy Dragon)
+
+**User Input:**
+- Theme: Fantasy
+- Subject: Dragon
+- Style: Epic
+- Mood: Dark
+
+**Generated Prompt:**
+```
+majestic dragon breathing fire, epic fantasy art, dark and dramatic mood, wide angle composition, dramatic lighting with glowing embers, highly detailed scales and wings, 8k resolution, cinematic atmosphere
+```
+
+**Generated Negative Prompt:**
+```
+cartoon, anime, sketch, blurry, low quality, jpeg artifacts, watermark, deformed anatomy, text overlay
+```
+
+---
+
+## Usage Notes
+
+- SDXL works best with natural language descriptions
+- Keep prompts under 75 tokens for best results
+- Use commas to separate concepts
+- Weight important terms with parentheses: `(majestic dragon:1.2)`
+- For specific styles, reference artists: `in the style of Greg Rutkowski`

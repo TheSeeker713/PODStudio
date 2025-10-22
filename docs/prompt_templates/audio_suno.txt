@@ -1,0 +1,75 @@
+# Audio Prompt Template — Suno
+
+**Platform:** Suno AI  
+**Model:** v3/v3.5  
+**Template Version:** 1.0
+
+---
+
+## Template
+
+```
+[{{genre}}], {{mood}}, {{instruments}}, {{tempo}}, {{structure}}
+```
+
+---
+
+## Variables
+
+- **genre**: Musical genre (e.g., "epic orchestral", "lo-fi hip hop", "synthwave")
+- **mood**: Emotional tone (e.g., "uplifting", "dark", "energetic", "calm")
+- **instruments**: Key instruments (e.g., "strings, brass, choir", "electric guitar, drums")
+- **tempo**: Speed (e.g., "120 BPM", "fast-paced", "slow and ambient")
+- **structure**: Song structure (e.g., "intro, verse, chorus, bridge", "loop-friendly")
+
+---
+
+## Optional Metadata Tags
+
+Suno supports structured metadata:
+
+```
+[Genre: Epic Orchestral]
+[Mood: Heroic]
+[BPM: 140]
+[Duration: 2 minutes]
+[Loop: Yes]
+```
+
+---
+
+## Example Output (Epic Battle Theme)
+
+**User Input:**
+- Theme: Fantasy
+- Use Case: Battle music
+- Mood: Epic
+- Duration: 2 minutes
+
+**Generated Prompt:**
+```
+[Epic Orchestral], heroic and intense, strings, brass, war drums, timpani, choir, 140 BPM, dramatic build-up with triumphant climax, loop-friendly, cinematic quality
+```
+
+**Alternative with Tags:**
+```
+[Genre: Epic Orchestral]
+[Mood: Heroic, Intense]
+[Instruments: Strings, Brass, Choir, Timpani]
+[BPM: 140]
+[Structure: Intro (0:00-0:15), Build-Up (0:15-0:45), Climax (0:45-1:30), Outro (1:30-2:00)]
+[Loop: Yes]
+
+Create an epic battle theme with dramatic orchestral elements, building tension and releasing in triumphant brass fanfares.
+```
+
+---
+
+## Usage Notes
+
+- Suno works best with genre + mood + instruments
+- Specify "loop-friendly" for game/background music
+- Avoid overly complex prompts (keep under 200 words)
+- Use bracketed tags for better control
+- For vocals, specify: `[Style: Female Vocals]` or `[Instrumental Only]`
+- Duration is approximate; Suno may extend or shorten slightly

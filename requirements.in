@@ -1,0 +1,78 @@
+# PODStudio Core Dependencies
+# Compile with: pip-compile requirements.in -o requirements.txt
+
+# ============================================================
+# UI Framework
+# ============================================================
+PySide6
+
+# ============================================================
+# Backend Service
+# ============================================================
+fastapi
+uvicorn[standard]
+python-multipart
+
+# ============================================================
+# Database & ORM
+# ============================================================
+sqlmodel
+aiosqlite
+sqlite-utils
+
+# ============================================================
+# Task Queue / Workers
+# ============================================================
+# Simple threadpool approach (no external deps)
+# Alternative: rq (requires Redis)
+# rq
+# redis
+
+# ============================================================
+# Media Processing
+# ============================================================
+Pillow
+opencv-python
+pydub
+python-magic-bin  # Windows-compatible python-magic
+requests
+
+# Optional video editing
+# moviepy
+
+# ============================================================
+# File & Metadata
+# ============================================================
+watchdog
+exifread
+piexif
+xxhash
+
+# ============================================================
+# External Tool Wrappers
+# ============================================================
+ffmpeg-python
+
+# ============================================================
+# AI/ML Libraries
+# ============================================================
+rembg
+# Real-ESRGAN (use external binary or install from source)
+# realesrgan
+
+# ============================================================
+# Configuration
+# ============================================================
+pydantic-settings
+python-dotenv
+
+# ============================================================
+# CLI Utilities
+# ============================================================
+typer
+rich  # For pretty CLI output
+
+# ============================================================
+# Packaging (for later steps)
+# ============================================================
+pyinstaller

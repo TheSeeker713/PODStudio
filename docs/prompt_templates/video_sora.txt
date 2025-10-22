@@ -1,0 +1,98 @@
+# Video Prompt Template — Sora-Style
+
+**Platform:** Sora (OpenAI) or similar text-to-video models  
+**Template Version:** 1.0  
+**Note:** Sora not publicly available as of Oct 2025; template based on published examples
+
+---
+
+## Template
+
+```
+{{shot_type}}: {{subject}} {{action}} in {{setting}}. {{style_description}}. {{technical_details}}.
+```
+
+---
+
+## Variables
+
+- **shot_type**: Type of shot (e.g., "Wide shot", "Close-up", "POV shot", "Time-lapse")
+- **subject**: Main subject with details
+- **action**: Specific action/movement
+- **setting**: Detailed environment description
+- **style_description**: Visual style and aesthetic
+- **technical_details**: Camera specs, lighting, quality (e.g., "35mm film", "natural lighting", "4K resolution")
+
+---
+
+## Shot Type Reference
+
+- **Extreme wide shot (EWS)**: Establishes environment
+- **Wide shot (WS)**: Subject in context
+- **Medium shot (MS)**: Waist up (characters)
+- **Close-up (CU)**: Face or object detail
+- **Extreme close-up (ECU)**: Eyes, texture detail
+- **POV shot**: Camera as character's eyes
+- **Over-the-shoulder**: Dialog/interaction shots
+
+---
+
+## Example Output (Dragon Flight)
+
+**User Input:**
+- Theme: Fantasy
+- Action: Dragon flying
+- Setting: Mountains
+- Style: Cinematic
+
+**Generated Prompt:**
+```
+Wide shot: A majestic crimson dragon with enormous wings soaring gracefully through a mountain valley at golden hour. The dragon's scales shimmer in the warm sunset light as clouds drift past. Medieval stone castle visible on distant cliff. Cinematic composition with dramatic depth of field, shot on 35mm film, natural volumetric lighting, photorealistic fantasy style, 4K resolution.
+```
+
+**Alternative (Close-up):**
+```
+Close-up: Detailed view of a dragon's head as it breathes a stream of fire, intense orange flames illuminating its dark red scales. Fierce amber eyes reflecting firelight. Shot with shallow depth of field, background mountains blurred. Cinematic fantasy realism, dramatic lighting, RED camera aesthetic.
+```
+
+---
+
+## Style Keywords
+
+- **Cinematic**: Film-like quality, color grading, depth of field
+- **Documentary**: Realistic, natural lighting, handheld feel
+- **Drone footage**: Aerial perspectives, smooth motion
+- **Time-lapse**: Accelerated passage of time
+- **Slow-motion**: High frame rate, dramatic action
+- **Film noir**: High contrast, shadows, moody
+- **Vintage film**: Grainy, color shifts, retro aesthetic
+
+---
+
+## Technical Specifications
+
+**Camera Specs (reference for style):**
+- `35mm film` — Classic cinematic look
+- `IMAX 70mm` — Epic, ultra-high resolution
+- `RED camera` — Modern digital cinema
+- `GoPro` — Action/POV style
+- `Drone` — Aerial footage aesthetic
+
+**Lighting:**
+- `golden hour` — Warm sunset/sunrise
+- `blue hour` — Cool twilight
+- `overcast` — Soft, diffused light
+- `harsh sunlight` — Strong shadows
+- `volumetric lighting` — Light rays, atmospheric
+
+---
+
+## Usage Notes
+
+- Sora-style models excel at realistic physics and motion
+- Describe lighting explicitly for best results
+- Reference real camera equipment for authentic look
+- Keep prompts detailed but under 300 words
+- For POD assets, aim for "cinematic" + "photorealistic"
+- Avoid impossible physics (unless intentional)
+- Specify "seamless loop" for looping backgrounds
