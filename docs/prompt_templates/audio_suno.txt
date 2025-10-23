@@ -1,7 +1,7 @@
 # Audio Prompt Template — Suno
 
-**Platform:** Suno AI  
-**Model:** v3/v3.5  
+**Platform:** Suno AI
+**Model:** v3/v3.5
 **Template Version:** 1.0
 
 ---

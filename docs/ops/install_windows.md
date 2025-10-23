@@ -136,14 +136,32 @@ PACKS_ROOT=./Packs
 python -m app.cli.manage db-init
 ```
 
-### 8. Run Application (When Implemented)
+### 8. Run Application
 
+**Desktop UI (Development Mode)**:
 ```powershell
-# Desktop UI
-python -m app.ui.main_window
+# Run the PySide6 desktop app
+python -m app.ui.app
+```
 
-# Or backend service (testing)
+Expected behavior (STEP 2 scaffold):
+- Main window appears with placeholder widgets
+- Left/right docks are collapsible
+- Center shows 3 tabs (Images, Audio, Video) with empty grid states
+- Bottom tray shows "0 selected" with disabled Build Pack button
+- Status bar shows "Ready | No assets loaded"
+
+**Backend Service (Testing Only)**:
+```powershell
+# Run FastAPI backend (when implemented in Step 3+)
 uvicorn app.backend.server:app --host 127.0.0.1 --port 8765
+```
+
+**CLI Tools (Future)**:
+```powershell
+# Database management (when implemented)
+python -m app.cli.manage db-init
+python -m app.cli.manage db-migrate
 ```
 
 ---

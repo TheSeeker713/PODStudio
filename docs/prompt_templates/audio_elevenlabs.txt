@@ -1,7 +1,7 @@
 # Audio Prompt Template — ElevenLabs
 
-**Platform:** ElevenLabs  
-**Use Case:** Voice synthesis, sound effects (if supported)  
+**Platform:** ElevenLabs
+**Use Case:** Voice synthesis, sound effects (if supported)
 **Template Version:** 1.0
 
 ---

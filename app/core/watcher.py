@@ -8,8 +8,6 @@ TODO (Step 2+): Implement with:
 - Configurable watch folders from .env
 """
 
-from watchdog.observers import Observer
-
 
 def start_watcher(folders: list[str]):
     """

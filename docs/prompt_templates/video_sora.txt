@@ -1,7 +1,7 @@
 # Video Prompt Template — Sora-Style
 
-**Platform:** Sora (OpenAI) or similar text-to-video models  
-**Template Version:** 1.0  
+**Platform:** Sora (OpenAI) or similar text-to-video models
+**Template Version:** 1.0
 **Note:** Sora not publicly available as of Oct 2025; template based on published examples
 
 ---

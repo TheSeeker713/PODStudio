@@ -1,7 +1,7 @@
 # Video Prompt Template — Kling AI
 
-**Platform:** Kling AI  
-**Model:** Kling v1.5  
+**Platform:** Kling AI
+**Model:** Kling v1.5
 **Template Version:** 1.0
 
 ---

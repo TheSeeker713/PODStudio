@@ -1,5 +1,7 @@
 # PODStudio
 
+[![CI Pipeline](https://github.com/<youruser>/PODStudio/actions/workflows/ci.yml/badge.svg)](https://github.com/<youruser>/PODStudio/actions/workflows/ci.yml)
+
 **Windows-first desktop app for building store-ready print-on-demand AI asset packs**
 
 ## Overview
