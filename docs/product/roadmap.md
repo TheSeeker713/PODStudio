@@ -21,45 +21,68 @@
 ---
 
 ## Milestone 2 (M2): UI Skeleton & Database
-**Status**: Planned  
+**Status**: ✅ Complete  
 **Duration**: Step 2-3 (2 weeks)  
 **Goal**: Empty UI shell + SQLite schema
 
 ### Deliverables
-- [ ] PySide6 main window with dock layout
-- [ ] Empty grid view (no thumbnails yet)
-- [ ] SQLModel schemas (Asset, Job, Pack)
-- [ ] Database migrations
-- [ ] Hardware probe (GPU/CPU/RAM detection)
+- [x] PySide6 main window with dock layout
+- [x] Empty grid view (no thumbnails yet)
+- [x] SQLModel schemas (Asset, Job, Pack)
+- [x] Database migrations
+- [x] Hardware probe (GPU/CPU/RAM detection)
 
 ---
 
-## Milestone 3 (M3): File Ingestion
-**Status**: Planned  
+## Milestone 3 (M3): File Ingestion & Curation
+**Status**: ✅ Complete (STEP 4-5)  
 **Duration**: Step 4-5 (2 weeks)  
-**Goal**: Auto-detect and organize assets
+**Goal**: Auto-detect, organize, and curate assets
+
+### Deliverables
+- [x] File watcher (watchdog integration)
+- [x] MIME + ffprobe file type detection
+- [x] Auto-organization to /Workspace/{theme}/{type}
+- [x] Thumbnail generation (Pillow for images, ffmpeg for video, placeholders for audio)
+- [x] Asset grid displays thumbnails with metadata
+- [x] Multi-select support (Ctrl+Click, Shift+Click)
+- [x] Right dock curation controls (Approve, Reject/Delete, Tag, Move, Rename)
+- [x] File operations with collision handling
+- [x] Database synchronization on all operations
+- [x] Automatic grid refresh after curation actions
+
+### Acceptance Criteria
+- ✅ File watcher detects new files in monitored directories
+- ✅ Assets automatically added to database with type detection
+- ✅ Thumbnails generated and cached (Cache/thumbs/)
+- ✅ Grid view shows asset cards with thumbnails and status
+- ✅ User can select single or multiple assets
+- ✅ Context menu provides curation actions
+- ✅ Right dock shows selected asset metadata
+- ✅ Approve button marks assets as approved in DB
+- ✅ Reject/Delete removes assets from DB and disk
+- ✅ Rename changes filename with collision handling
+- ✅ Move relocates files to theme folders
+- ✅ Tag assigns theme metadata without moving files
+- ✅ Grid refreshes automatically after operations
+- ✅ File operations update database paths correctly
+
+---
+
+## Milestone 4 (M4): Advanced Curation & Filters
+**Status**: Planned  
+**Duration**: Step 6-7 (2 weeks)  
+**Goal**: Enhanced curation workflows
 
 ### Deliverables
 - [ ] Drag-and-drop file support
-- [ ] File watcher (watchdog integration)
-- [ ] MIME + ffprobe file type detection
-- [ ] Auto-organization to /Library
-- [ ] Thumbnail generation (images/video/audio)
-- [ ] Grid view displays thumbnails
-
----
-
-## Milestone 4 (M4): Curation UI
-**Status**: Planned  
-**Duration**: Step 6-7 (2 weeks)  
-**Goal**: Approve/reject workflow
-
-### Deliverables
-- [ ] Keyboard shortcuts (A/R/Space/1-5)
-- [ ] Approval status overlay (green/red borders)
-- [ ] Inspector panel (Right Dock)
+- [ ] Keyboard shortcuts (A=Approve, R=Reject, Space=Preview, Del=Delete, F2=Rename)
 - [ ] Filters (type, status, tags, date)
-- [ ] Selection counter + bottom tray
+- [ ] Search functionality
+- [ ] Batch operations UI
+- [ ] Undo/Redo for curation actions
+- [ ] Preview panel for selected assets
+- [ ] Metadata editing (custom fields)
 
 ---
 

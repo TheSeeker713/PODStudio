@@ -106,8 +106,19 @@ class MainWindow(QMainWindow):
         # Right Dock: Inspector, Actions, History
         self.right_dock = QDockWidget("Inspector", self)
         self.right_dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.right_dock.setWidget(RightDock())
+        self.right_dock_widget = RightDock()
+        self.right_dock.setWidget(self.right_dock_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.right_dock)
+
+        # Connect grid selection to right dock
+        self.images_grid.selection_changed.connect(self.right_dock_widget.update_selection)
+        self.audio_grid.selection_changed.connect(self.right_dock_widget.update_selection)
+        self.video_grid.selection_changed.connect(self.right_dock_widget.update_selection)
+
+        # Connect right dock refresh signal to grids
+        self.right_dock_widget.refresh_requested.connect(self.images_grid.refresh)
+        self.right_dock_widget.refresh_requested.connect(self.audio_grid.refresh)
+        self.right_dock_widget.refresh_requested.connect(self.video_grid.refresh)
 
         # Bottom Tray: Selection counter + Build Pack button
         self.bottom_tray = SelectionTray()
