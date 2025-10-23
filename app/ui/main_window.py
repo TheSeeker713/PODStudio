@@ -2,18 +2,23 @@
 Main Window - PODStudio Desktop UI
 Video editor-style layout with collapsible docks
 
-STEP 2: Scaffold only - no business logic
+STEP 4: Added file watcher controls and status indicator
 """
 
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDockWidget, QMainWindow, QStatusBar, QTabWidget, QToolBar
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QDockWidget, QMainWindow, QMenu, QStatusBar, QTabWidget, QToolBar
 
+from app.core.logging import get_logger
+from app.core.watcher import get_watcher
 from app.ui.widgets.asset_grid import AssetGrid
 from app.ui.widgets.dock_left import LeftDock
 from app.ui.widgets.dock_right import RightDock
 from app.ui.widgets.selection_tray import SelectionTray
 from app.ui.widgets.top_bar import TopBar
+
+logger = get_logger(__name__)
 
 
 class MainWindow(QMainWindow):
@@ -33,7 +38,13 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PODStudio - AI Asset Pack Builder")
         self.setMinimumSize(1200, 800)
 
+        # Watcher state tracking
+        self._watcher_running = False
+        self._watcher_status_timer = QTimer()
+        self._watcher_status_timer.timeout.connect(self._update_watcher_status)
+
         # Initialize UI components
+        self._init_menubar()
         self._init_ui()
         self._init_docks()
         self._init_statusbar()
@@ -43,6 +54,29 @@ class MainWindow(QMainWindow):
 
         # Start maximized by default
         self.showMaximized()
+
+        # Start watcher status update timer (every 2 seconds)
+        self._watcher_status_timer.start(2000)
+
+    def _init_menubar(self):
+        """Initialize menu bar with Tools menu"""
+        menubar = self.menuBar()
+
+        # Tools menu with watcher controls
+        tools_menu: QMenu = menubar.addMenu("&Tools")
+
+        # Start Watcher action
+        self.action_start_watcher = QAction("Start File Watcher", self)
+        self.action_start_watcher.setStatusTip("Start monitoring folders for new assets")
+        self.action_start_watcher.triggered.connect(self._start_watcher)
+        tools_menu.addAction(self.action_start_watcher)
+
+        # Stop Watcher action
+        self.action_stop_watcher = QAction("Stop File Watcher", self)
+        self.action_stop_watcher.setStatusTip("Stop monitoring folders")
+        self.action_stop_watcher.triggered.connect(self._stop_watcher)
+        self.action_stop_watcher.setEnabled(False)  # Disabled by default
+        tools_menu.addAction(self.action_stop_watcher)
 
     def _init_ui(self):
         """Initialize central widget and tabs"""
@@ -92,10 +126,54 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(self.top_bar)
         self.addToolBar(Qt.TopToolBarArea, toolbar)
 
-        # Status bar at bottom
+        # Status bar at bottom with watcher status
         self.status = QStatusBar()
-        self.status.showMessage("Ready | No assets loaded")
+        self.status.showMessage("Ready | Watcher: Stopped")
         self.setStatusBar(self.status)
+
+    def _start_watcher(self):
+        """Start file watcher"""
+        try:
+            watcher = get_watcher()
+            watcher.start()
+            self._watcher_running = True
+            self.action_start_watcher.setEnabled(False)
+            self.action_stop_watcher.setEnabled(True)
+            logger.info("File watcher started from UI")
+            self._update_watcher_status()
+        except Exception as e:
+            logger.error(f"Failed to start watcher: {e}")
+            self.status.showMessage(f"Error: Failed to start watcher - {e}")
+
+    def _stop_watcher(self):
+        """Stop file watcher"""
+        try:
+            watcher = get_watcher()
+            watcher.stop()
+            self._watcher_running = False
+            self.action_start_watcher.setEnabled(True)
+            self.action_stop_watcher.setEnabled(False)
+            logger.info("File watcher stopped from UI")
+            self._update_watcher_status()
+        except Exception as e:
+            logger.error(f"Failed to stop watcher: {e}")
+            self.status.showMessage(f"Error: Failed to stop watcher - {e}")
+
+    def _update_watcher_status(self):
+        """Update status bar with current watcher state"""
+        try:
+            watcher = get_watcher()
+            is_running = watcher.is_running()
+
+            if is_running:
+                folder_count = len(watcher.folders)
+                status_text = f"Ready | Watcher: Running ({folder_count} folders)"
+            else:
+                status_text = "Ready | Watcher: Stopped"
+
+            self.status.showMessage(status_text)
+        except Exception as e:
+            logger.error(f"Failed to update watcher status: {e}")
 
     def _restore_window_state(self):
         """
@@ -127,6 +205,18 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         """Handle window close event"""
+        # Stop watcher timer
+        self._watcher_status_timer.stop()
+
+        # Stop watcher if running
+        if self._watcher_running:
+            try:
+                watcher = get_watcher()
+                watcher.stop()
+                logger.info("Stopped file watcher on window close")
+            except Exception as e:
+                logger.error(f"Failed to stop watcher on close: {e}")
+
         self._save_window_state()
         event.accept()
 
