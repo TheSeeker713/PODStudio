@@ -32,9 +32,116 @@ This document specifies the **exact inputs, outputs, parameters, and steps** for
 
 ---
 
+## Job Queue System (M3 Implementation)
+
+**Status:** Implemented in STEP 6
+
+### Architecture
+
+PODStudio uses a **ThreadPoolExecutor-based job queue** for asynchronous media processing:
+
+- **Executor:** Python `concurrent.futures.ThreadPoolExecutor` with `MAX_WORKERS=4`
+- **Storage:** SQLite `Job` table tracks all jobs with status, progress, timestamps
+- **Job Kinds:** `BG_REMOVE`, `UPSCALE`, `THUMBNAIL`, `TRANSCODE`
+- **Job Status:** `PENDING` → `RUNNING` → `COMPLETED` / `FAILED` / `CANCELLED`
+
+### Job Lifecycle
+
+1. **Enqueue:** `enqueue_job(kind, job_func, asset_id, params)` creates Job record, submits to threadpool
+2. **Execute:** Worker thread runs `_run_job()` wrapper, which:
+   - Marks job `RUNNING` in database
+   - Executes `job_func(job_id)` with exception handling
+   - Updates progress via `update_job_progress(job_id, 0.0-1.0)`
+   - Marks `COMPLETED` with `result_path` or `FAILED` with `error_message`
+3. **Track:** `get_job_status(job_id)` queries Job record for current state
+4. **Cancel:** `cancel_job(job_id)` marks `CANCELLED` (note: ThreadPool doesn't support true cancellation)
+
+### API Endpoints
+
+- `POST /api/jobs/bg-remove` — Enqueue background removal jobs
+- `POST /api/jobs/video-poster` — Enqueue video poster frame extraction
+- `POST /api/jobs/audio-waveform` — Enqueue audio waveform generation
+- `GET /api/jobs/{job_id}` — Query job status with progress
+
+### Output Directories
+
+- **Background Removal:** `/Work/edits/{filename}_nobg.png`
+- **Video Posters:** `/Work/posters/{filename}_poster.jpg`
+- **Audio Waveforms:** `/Work/waveforms/{filename}_waveform.png`
+
+### Progress Reporting
+
+Jobs update progress at key checkpoints:
+- `0.1` — Started, loading asset
+- `0.2` — Loaded input
+- `0.5` — Processing (midpoint)
+- `0.8` — Processed, saving
+- `1.0` — Completed
+
+### Error Handling
+
+- **Missing Asset:** Job fails immediately with `error_message`
+- **Missing File:** Job fails after loading attempt
+- **Processing Error:** Job fails with exception message, stack trace logged
+- **Filename Collision:** Outputs append `_1`, `_2`, etc. to avoid overwriting
+
+---
+
 ## Image Pipelines
 
-### 1. Background Removal
+### 1. Background Removal (M3 Implementation)
+
+**Status:** Implemented in STEP 6 using rembg
+
+**Purpose:** Remove background, output transparent PNG
+
+**Inputs:**
+- `asset_id` (int) — Source image asset
+- Job submitted via `POST /api/jobs/bg-remove` with `asset_ids: [...]`
+
+**Outputs:**
+- New file: `/Work/edits/{filename}_nobg.png` (RGBA PNG)
+- `result_path` stored in Job record
+- Collision handling: Appends `_1`, `_2`, etc. if file exists
+
+**Implementation Steps:**
+1. **Load Asset Record** from database via `job.asset_id`
+2. **Load Image:** `PIL.Image.open(asset.path)`
+3. **Remove Background:** `rembg.remove(input_image)` using U2Net model
+4. **Save Output:**
+   - Format: PNG with alpha channel
+   - Location: `/Work/edits/{stem}_nobg.png`
+   - Collision check: If exists, try `_nobg_1`, `_nobg_2`, etc.
+5. **Update Job Progress:**
+   - `0.1` — Started
+   - `0.2` — Loaded image
+   - `0.8` — Background removed
+   - `1.0` — Saved output
+6. **Update Job:** status=COMPLETED, result_path set
+
+**Worker:** `app.workers.jobs.bg_remove.run_bg_remove_job(job_id)`
+
+**Compute Cost:**
+- CPU (8 threads): 5-15 seconds per 1024×1024 image
+- RAM: ~1-2 GB peak
+- Model: U2Net (176 MB, auto-downloaded to rembg cache)
+
+**Error Handling:**
+- **Missing asset:** Job fails with "Asset not found"
+- **Missing file:** Job fails with "File not found"
+- **Processing error:** Job fails with exception message
+- **Save error:** Job fails with I/O error message
+
+**Future Enhancements (Not Yet Implemented):**
+- `model` (enum) — `u2net` | `u2netp` | `silueta` (default: `u2net`)
+- `output_format` (enum) — `png` | `webp` (default: `png`)
+- `use_gpu` (bool) — Try GPU acceleration (default: `true`)
+- Alpha mask generation: `/Work/masks/{asset_id}__mask__{timestamp}.png`
+- Create new Asset record with parent_asset_id linkage
+
+---
+
+### 2. Image Upscale (Real-ESRGAN) — NOT YET IMPLEMENTED
 
 **Purpose:** Remove background, output transparent PNG
 
@@ -482,7 +589,138 @@ This document specifies the **exact inputs, outputs, parameters, and steps** for
 
 ---
 
-### 12. Video Thumbnail
+### 12. Video Thumbnail (M3 Implementation)
+
+**Status:** Implemented in STEP 6 using ffmpeg
+
+**Purpose:** Extract single frame as poster/thumbnail
+
+**Inputs:**
+- `asset_id` (int) — Source video asset
+- Job submitted via `POST /api/jobs/video-poster` with `asset_ids: [...]`
+- Frame extracted at 1 second (`-ss 00:00:01`)
+
+**Outputs:**
+- File: `/Work/posters/{filename}_poster.jpg`
+- `result_path` stored in Job record
+- Collision handling: Appends `_1`, `_2`, etc.
+
+**Implementation Steps:**
+1. **Load Asset Record** from database via `job.asset_id`
+2. **Build ffmpeg Command:**
+   ```
+   ffmpeg -ss 00:00:01 -i {video_path} -vframes 1 -q:v 2 -y {output_path}
+   ```
+   - `-ss 00:00:01` — Seek to 1 second (avoids black intro frames)
+   - `-vframes 1` — Extract single frame
+   - `-q:v 2` — High quality JPEG (1-31 scale, 2 = very high)
+   - `-y` — Overwrite output if exists
+3. **Execute ffmpeg:**
+   - Subprocess with 30-second timeout
+   - `CREATE_NO_WINDOW` flag on Windows
+   - Capture stderr for error messages
+4. **Verify Output:** Check file exists and size > 0
+5. **Update Job Progress:**
+   - `0.1` — Started
+   - `0.3` — ffmpeg launched
+   - `0.5` — Frame extracted
+   - `1.0` — Completed
+6. **Update Job:** status=COMPLETED, result_path set
+
+**Worker:** `app.workers.jobs.thumbnails.run_video_poster_job(job_id)`
+
+**Compute Cost:**
+- Time: 1-5 seconds per video (depends on codec/resolution)
+- RAM: <500 MB
+- Disk: Output size ~50-200 KB (JPEG)
+
+**Error Handling:**
+- **Missing video:** Job fails with "File not found"
+- **ffmpeg timeout:** Job fails after 30 seconds
+- **ffmpeg error:** Job fails with stderr output
+- **Corrupted video:** Job fails with ffmpeg error message
+
+**Future Enhancements (Not Yet Implemented):**
+- `timestamp` (float) — Custom time in seconds (default: 25% of duration)
+- `size` (int) — Resize to max dimension (default: preserve original)
+- Format: `jpg` | `png` | `webp`
+- Multiple frames for animated thumbnail
+
+---
+
+### 13. Audio Waveform Thumbnail (M3 Implementation)
+
+**Status:** Implemented in STEP 6 using pydub + PIL
+
+**Purpose:** Generate PNG waveform visualization for audio files
+
+**Inputs:**
+- `asset_id` (int) — Source audio asset
+- Job submitted via `POST /api/jobs/audio-waveform` with `asset_ids: [...]`
+- Fixed dimensions: 800×200 pixels
+- Waveform color: Green (100, 200, 100)
+
+**Outputs:**
+- File: `/Work/waveforms/{filename}_waveform.png`
+- `result_path` stored in Job record
+- Collision handling: Appends `_1`, `_2`, etc.
+
+**Implementation Steps:**
+1. **Load Asset Record** from database via `job.asset_id`
+2. **Load Audio:**
+   - `pydub.AudioSegment.from_file(asset.path)`
+   - Convert to raw samples: `.get_array_of_samples()`
+3. **Downsample Audio:**
+   - Target: 2000 samples (matches 800px width * 2.5 samples/pixel)
+   - Method: Take every Nth sample where N = total_samples / 2000
+   - Normalize: Convert to float -1.0 to 1.0
+4. **Handle Stereo:**
+   - If stereo: Average left + right channels
+   - If mono: Use single channel
+5. **Draw Waveform:**
+   - Create 800×200 PIL.Image with dark background (20, 20, 20)
+   - Draw green waveform using PIL.ImageDraw
+   - For each x pixel (0-799):
+     - Calculate y = center + (sample_value * height/2)
+     - Draw line from center to y
+6. **Fallback (if audio loading fails):**
+   - `_create_placeholder_waveform()` — Flat line with "No Audio Data" text
+7. **Save Output:** PNG format
+8. **Update Job Progress:**
+   - `0.1` — Started
+   - `0.3` — Loaded audio
+   - `0.5` — Processed samples
+   - `1.0` — Saved waveform
+9. **Update Job:** status=COMPLETED, result_path set
+
+**Worker:** `app.workers.jobs.thumbnails.run_audio_waveform_job(job_id)`
+
+**Compute Cost:**
+- Time: 1-5 seconds per audio file
+- RAM: <200 MB (audio loaded fully into memory)
+- Disk: Output size ~50-100 KB (PNG)
+
+**Dependencies:**
+- `pydub` — Audio loading/decoding
+- `numpy` — Array processing for downsampling
+- `PIL` (Pillow) — Image drawing
+
+**Error Handling:**
+- **Missing audio:** Job fails with "File not found"
+- **Unsupported format:** Falls back to placeholder waveform
+- **Corrupted audio:** Falls back to placeholder waveform
+- **pydub error:** Falls back to placeholder waveform
+
+**Future Enhancements (Not Yet Implemented):**
+- `width` (int) — Custom width (default: 800)
+- `height` (int) — Custom height (default: 200)
+- `color` (hex) — Waveform color (default: green)
+- Stereo separation (left/right channels visualized separately)
+- Frequency spectrum (FFT-based spectrogram)
+
+---
+
+### 14. Image Thumbnail (Cache) — NOT YET IMPLEMENTED
 
 **Purpose:** Extract frame as thumbnail
 
