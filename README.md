@@ -112,7 +112,7 @@ Open **two terminal windows**:
 
 **Terminal 1 - Backend API**:
 ```powershell
-uvicorn app.backend.server:app --reload --port 8971
+python -m uvicorn app.backend.server:app --reload --port 8971
 ```
 
 **Terminal 2 - Desktop UI**:

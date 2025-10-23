@@ -6,7 +6,7 @@ STEP 3: FastAPI skeleton with health/probe/jobs stubs.
 No heavy logic yet - just API scaffolding.
 
 To run:
-    uvicorn app.backend.server:app --reload --port 8971
+    python -m uvicorn app.backend.server:app --reload --port 8971
 """
 
 from fastapi import FastAPI

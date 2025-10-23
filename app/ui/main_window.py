@@ -7,7 +7,7 @@ STEP 2: Scaffold only - no business logic
 
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDockWidget, QMainWindow, QStatusBar, QTabWidget
+from PySide6.QtWidgets import QDockWidget, QMainWindow, QStatusBar, QTabWidget, QToolBar
 
 from app.ui.widgets.asset_grid import AssetGrid
 from app.ui.widgets.dock_left import LeftDock
@@ -40,6 +40,9 @@ class MainWindow(QMainWindow):
 
         # Restore window state (placeholder)
         self._restore_window_state()
+
+        # Start maximized by default
+        self.showMaximized()
 
     def _init_ui(self):
         """Initialize central widget and tabs"""
@@ -82,9 +85,12 @@ class MainWindow(QMainWindow):
 
     def _init_statusbar(self):
         """Initialize custom top bar and status bar"""
-        # Top bar (custom widget above central area)
+        # Top bar (add as toolbar at the top with custom widget)
         self.top_bar = TopBar()
-        # TODO: Add top_bar to layout (needs custom title bar implementation)
+        toolbar = QToolBar("Top Bar")
+        toolbar.setMovable(False)
+        toolbar.addWidget(self.top_bar)
+        self.addToolBar(Qt.TopToolBarArea, toolbar)
 
         # Status bar at bottom
         self.status = QStatusBar()
