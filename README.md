@@ -92,11 +92,37 @@ pip install -r requirements.txt
 # Copy environment template
 copy .env.example .env
 
-# Run app (when implemented)
-python -m app.ui.main_window
+# Run app (STEP 2: UI only, backend offline)
+python -m app.ui.app
 ```
 
 ## Development
+
+### Running the Application (STEP 3+)
+
+**Option 1: Desktop UI Only**
+```powershell
+python -m app.ui.app
+```
+(Top bar will show "API: OFFLINE" since backend is not running)
+
+**Option 2: Backend + UI Together** (Recommended)
+
+Open **two terminal windows**:
+
+**Terminal 1 - Backend API**:
+```powershell
+uvicorn app.backend.server:app --reload --port 8971
+```
+
+**Terminal 2 - Desktop UI**:
+```powershell
+python -m app.ui.app
+```
+
+Backend API docs available at: http://127.0.0.1:8971/docs
+
+---
 
 ### Prerequisites
 

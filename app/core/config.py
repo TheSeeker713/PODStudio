@@ -47,7 +47,8 @@ class Settings(BaseSettings):
 
     # Backend Service
     backend_host: str = "127.0.0.1"
-    backend_port: int = 8765
+    backend_port: int = 8971  # Updated from 8765 to match Step 3
+    api_base_url: str = "http://127.0.0.1:8971"  # Full URL for UI to connect to backend
 
     # Processing Defaults
     bg_remove_model: str = "u2net"

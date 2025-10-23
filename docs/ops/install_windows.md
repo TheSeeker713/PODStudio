@@ -138,16 +138,55 @@ python -m app.cli.manage db-init
 
 ### 8. Run Application
 
-**Desktop UI (Development Mode)**:
+**Option A: Desktop UI Only (STEP 2)**:
 ```powershell
 # Run the PySide6 desktop app
 python -m app.ui.app
 ```
 
-Expected behavior (STEP 2 scaffold):
+Expected behavior:
 - Main window appears with placeholder widgets
 - Left/right docks are collapsible
 - Center shows 3 tabs (Images, Audio, Video) with empty grid states
+- Bottom tray shows "0 selected" with disabled Build Pack button
+- Top bar shows "API: OFFLINE" (backend not running)
+
+**Option B: Backend + UI Together (STEP 3+)**:
+
+You need **two terminal windows**:
+
+**Terminal 1 - Backend API**:
+```powershell
+# Start FastAPI backend server
+uvicorn app.backend.server:app --reload --port 8971
+```
+
+Expected output:
+```
+INFO:     Uvicorn running on http://127.0.0.1:8971 (Press CTRL+C to quit)
+INFO:     Started reloader process
+INFO:     Started server process
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+```
+
+**Terminal 2 - Desktop UI**:
+```powershell
+# Run the PySide6 desktop app
+python -m app.ui.app
+```
+
+Expected behavior:
+- Main window appears
+- Top bar shows "API: OK" in green (backend connected)
+- Hardware pill shows "Mode: UNKNOWN" (probe endpoint returns placeholder)
+- All other UI elements same as Option A
+
+**Verify Backend**:
+Open browser to http://127.0.0.1:8971/docs to see FastAPI Swagger UI.
+
+**Stop Backend**:
+Press `Ctrl+C` in Terminal 1 to stop the backend server.
 - Bottom tray shows "0 selected" with disabled Build Pack button
 - Status bar shows "Ready | No assets loaded"
 
