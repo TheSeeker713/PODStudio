@@ -1,225 +1,76 @@
 # PODStudio — Development Roadmap
 
-**Version**: 0.1.0  
-**Timeline**: Oct 2025 - Q2 2026  
-**Last Updated**: October 22, 2025
+**Version**: 0.3.0
+**Last Updated**: Today
 
 ---
 
-## Milestone 1 (M1): Project Bootstrap ✅
-**Status**: Complete  
-**Duration**: Step 1 (1 week)  
-**Goal**: Clean workspace, tooling, docs
-
-### Deliverables
-- [x] Python venv with all dependencies
-- [x] Project structure (/app, /docs, /tests)
-- [x] Git repo with CI placeholder
-- [x] Design docs (vision, north_star, specs)
-- [x] External tool documentation
+## Milestone 1: Foundational Setup (M1)
+**Status**: ✅ Complete (Steps 0-1)
+- **Deliverables**: Project structure, Git repo, CI, design docs, Python environment.
 
 ---
 
-## Milestone 2 (M2): UI Skeleton & Database
-**Status**: ✅ Complete  
-**Duration**: Step 2-3 (2 weeks)  
-**Goal**: Empty UI shell + SQLite schema
-
-### Deliverables
-- [x] PySide6 main window with dock layout
-- [x] Empty grid view (no thumbnails yet)
-- [x] SQLModel schemas (Asset, Job, Pack)
-- [x] Database migrations
-- [x] Hardware probe (GPU/CPU/RAM detection)
+## Milestone 2: UI & Database Core (M2)
+**Status**: ✅ Complete (Steps 2-3)
+- **Deliverables**: PySide6 UI shell, SQLite schema, database migrations, hardware probe.
 
 ---
 
-## Milestone 3 (M3): File Ingestion & Curation
-**Status**: ✅ Complete (STEP 4-5)  
-**Duration**: Step 4-5 (2 weeks)  
-**Goal**: Auto-detect, organize, and curate assets
-
-### Deliverables
-- [x] File watcher (watchdog integration)
-- [x] MIME + ffprobe file type detection
-- [x] Auto-organization to /Workspace/{theme}/{type}
-- [x] Thumbnail generation (Pillow for images, ffmpeg for video, placeholders for audio)
-- [x] Asset grid displays thumbnails with metadata
-- [x] Multi-select support (Ctrl+Click, Shift+Click)
-- [x] Right dock curation controls (Approve, Reject/Delete, Tag, Move, Rename)
-- [x] File operations with collision handling
-- [x] Database synchronization on all operations
-- [x] Automatic grid refresh after curation actions
-
-### Acceptance Criteria
-- ✅ File watcher detects new files in monitored directories
-- ✅ Assets automatically added to database with type detection
-- ✅ Thumbnails generated and cached (Cache/thumbs/)
-- ✅ Grid view shows asset cards with thumbnails and status
-- ✅ User can select single or multiple assets
-- ✅ Context menu provides curation actions
-- ✅ Right dock shows selected asset metadata
-- ✅ Approve button marks assets as approved in DB
-- ✅ Reject/Delete removes assets from DB and disk
-- ✅ Rename changes filename with collision handling
-- ✅ Move relocates files to theme folders
-- ✅ Tag assigns theme metadata without moving files
-- ✅ Grid refreshes automatically after operations
-- ✅ File operations update database paths correctly
+## Milestone 3: Curation & File Management (M3)
+**Status**: ✅ Complete (Steps 4-5)
+- **Deliverables**: File watcher, thumbnail generation, asset grid, multi-select, full suite of curation actions (approve, reject, tag, move, rename), DB sync.
 
 ---
 
-## Milestone 4 (M4): Advanced Curation & Filters
-**Status**: Planned  
-**Duration**: Step 6-7 (2 weeks)  
-**Goal**: Enhanced curation workflows
-
-### Deliverables
-- [ ] Drag-and-drop file support
-- [ ] Keyboard shortcuts (A=Approve, R=Reject, Space=Preview, Del=Delete, F2=Rename)
-- [ ] Filters (type, status, tags, date)
-- [ ] Search functionality
-- [ ] Batch operations UI
-- [ ] Undo/Redo for curation actions
-- [ ] Preview panel for selected assets
-- [ ] Metadata editing (custom fields)
+## Milestone 4: Offline AI Agent Layer (M4)
+**Status**: ✅ Complete (Steps 6-7)
+- **Deliverables**: Llama.cpp server management, multi-agent abstraction (`llm_client.py`), health checks, model registry, GGUF model support.
 
 ---
 
-## Milestone 5 (M5): First Processing Pipeline
-**Status**: Planned  
-**Duration**: Step 8-9 (2 weeks)  
-**Goal**: Background removal working
-
-### Deliverables
-- [ ] Worker queue (ThreadPoolExecutor)
-- [ ] Job status tracking (DB + UI)
-- [ ] rembg integration (GPU/CPU fallback)
-- [ ] Progress bar with ETA
-- [ ] Output to /Work folder
-- [ ] Grid toggle: [Original] [BG-Removed]
+## Milestone 5: Prompt Engine v2 (M5)
+**Status**: ✅ Complete (Step 8)
+- **Deliverables**: Dual-mode prompt engine (`TEMPLATE_ONLY`, `AGENT_ASSISTED`), Jinja2 integration, FastAPI endpoints for prompt generation, agent-based pipeline (vision->logic->dialog->fast).
 
 ---
 
-## Milestone 6 (M6): Pack Builder
-**Status**: Planned  
-**Duration**: Step 10-11 (2 weeks)  
-**Goal**: Export first pack
-
-### Deliverables
-- [ ] Pack creation dialog
-- [ ] README.md template (Gumroad/Etsy/etc.)
-- [ ] LICENSE.txt variants (Personal/Commercial/Extended)
-- [ ] manifest.json with SHA-256 checksums
-- [ ] ZIP export
-- [ ] Validation (required files, integrity)
+## Milestone 6: Pack Builder v2 (M6)
+**Status**: ✅ Complete (Step 9)
+- **Deliverables**:
+    - Pack exporter embeds prompt generation artifacts (`/prompts` directory).
+    - `final_prompts.json` and `agent_lineage.json` for reproducibility.
+    - `manifest.json` updated with `prompt_session_id` and `prompt_source`.
+    - Optional AI disclosure notes in `README.md` and `store_copy.txt`.
+    - UI checkbox to control disclosure.
 
 ---
 
-## Milestone 7 (M7): Hardware Guardrails
-**Status**: Planned  
-**Duration**: Step 12 (1 week)  
-**Goal**: Tier-based operation gating
-
-### Deliverables
-- [ ] GREEN/YELLOW/RED tier assignment
-- [ ] Pre-flight checks before jobs
-- [ ] Block dialogs with upgrade guidance
-- [ ] Fallback to CPU (with warnings)
-
----
-
-## Milestone 8 (M8): Full Media Pipelines
-**Status**: Planned  
-**Duration**: Step 13-14 (3 weeks)  
-**Goal**: All enhancement ops working
-
-### Deliverables
-- [ ] Image upscaling (Real-ESRGAN 2x/4x)
-- [ ] Video transcoding (FFmpeg)
-- [ ] Audio normalization (LUFS)
-- [ ] Video upscaling (FFmpeg + model)
-- [ ] Trim/crop operations
+## Milestone 7: Full-Featured Image Generation (M7)
+**Status**: **In Progress** (Step 10+)
+**Goal**: A full-window, offline-first image generation module.
+- **Key Features**:
+    - **Hardware**: AMD/DirectML and robust CPU-only support.
+    - **Models**: SDXL, SD3, FLUX, and community models.
+    - **No Limits**: Overcome the 75-token prompt limit for complex prompts.
+    - **UI**: Dedicated image generation window accessible from the top menu.
+    - **Integration**: Generated images feed directly into the curation grid.
 
 ---
 
-## Milestone 9 (M9): Prompt Templates
-**Status**: Planned  
-**Duration**: Step 15 (1 week)  
-**Goal**: Zero-AI prompt generation
-
-### Deliverables
-- [ ] Jinja2 template engine
-- [ ] 6 platform templates (SDXL, MidJourney, Suno, etc.)
-- [ ] Variable substitution UI
-- [ ] Batch generation (10+ prompts)
-- [ ] Export to TXT
+## Milestone 8: Advanced Curation & Filters (M8)
+**Status**: Planned
+- **Deliverables**: Drag-and-drop, keyboard shortcuts, filters, search, batch operations, undo/redo.
 
 ---
 
-## Milestone 10 (M10): Polish & Testing
-**Status**: Planned  
-**Duration**: Step 16-17 (2 weeks)  
-**Goal**: Beta-ready release
-
-### Deliverables
-- [ ] Unit tests (>80% coverage)
-- [ ] Integration tests (with mocks)
-- [ ] Manual QA (test plan)
-- [ ] Bug fixes
-- [ ] Dark mode theme
-- [ ] Performance profiling
+## Milestone 9: Media Processing Pipelines (M9)
+**Status**: Planned
+- **Deliverables**: Background removal (rembg), image upscaling (ESRGAN), video transcoding, audio normalization.
 
 ---
 
-## Milestone 11 (M11): Packaging & Release
-**Status**: Planned  
-**Duration**: Step 18 (1 week)  
-**Goal**: v1.0 release
-
-### Deliverables
-- [ ] PyInstaller build (single .exe)
-- [ ] Installer (NSIS or similar)
-- [ ] User documentation (end-user README)
-- [ ] GitHub release with binaries
-- [ ] Announcement (Twitter, Reddit, Discord)
-
----
-
-## Post-v1.0 Roadmap
-
-### v1.1 (Q2 2026): Usability Improvements
-- Enhanced keyboard shortcuts
-- Batch tagging
-- Custom themes
-- Export presets
-
-### v1.2 (Q3 2026): Cloud Mode (Optional)
-- Headless backend
-- Web UI for remote access
-- Team sync (shared packs)
-
-### v2.0 (Q4 2026): Marketplace Integrations
-- Auto-upload to Gumroad
-- Etsy API integration
-- Revenue tracking
-
-### v3.0 (2027): MacOS/Linux Support
-- Qt cross-platform port
-- Linux package (AppImage/Flatpak)
-- MacOS dmg
-
----
-
-## Success Criteria (v1.0)
-
-- [ ] <30 minutes from ingest to pack export
-- [ ] Zero crashes on GREEN-tier systems
-- [ ] 100 active users in first 3 months
-- [ ] 50+ GitHub stars
-- [ ] 20+ community contributions (issues/PRs)
-
----
-
-**Current Status**: M1 Complete, M2 Starting  
-**Next Milestone**: UI Skeleton (PySide6 main window)
+## Milestone 10: Polish, Release & Beyond (M10)
+**Status**: Planned
+- **Deliverables**: Unit/integration tests, manual QA, PyInstaller build, user docs, v1.0 release.
+- **Post-v1.0**: Marketplace integrations, cross-platform support.
