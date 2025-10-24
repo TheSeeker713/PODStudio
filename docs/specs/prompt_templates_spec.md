@@ -46,7 +46,187 @@ trending on ArtStation, highly detailed, 8k
 
 ---
 
-## STEP 7: LLM Agent Roles and Routing (New)
+## STEP 8: Agent-Assisted Prompt Engine v2 (New)
+
+### Overview
+
+PODStudio's Prompt Engine v2 provides **two modes** for generating prompts:
+
+1. **TEMPLATE_ONLY** (Zero-AI): Pure Jinja2 template substitution — always works, no dependencies
+2. **AGENT_ASSISTED** (Offline AI): Uses local LLM agents for enhancement — requires llama.cpp servers
+
+The system **automatically falls back** to TEMPLATE_ONLY if agents are unavailable, ensuring prompts always work.
+
+### Generation Modes
+
+#### TEMPLATE_ONLY Mode
+
+- **Input**: Template name + variables (e.g., `{subject: "dragon", style: "fantasy"}`)
+- **Process**: Jinja2 template rendering with variable substitution
+- **Output**: Rendered prompt string
+- **Performance**: <10ms (instant)
+- **Requirements**: None (always available)
+
+**Example**:
+```python
+generate_prompt(
+    template_name="image_sdxl",
+    variables={"subject": "dragon", "style": "fantasy art"},
+    mode=PromptMode.TEMPLATE_ONLY
+)
+# → "dragon, fantasy art, epic mood, wide angle, dramatic lighting, highly detailed"
+```
+
+#### AGENT_ASSISTED Mode
+
+- **Input**: Template name + variables + optional reference image
+- **Process**: Multi-agent pipeline (vision → logic → dialog)
+- **Output**: AI-enhanced prompt with keywords and lineage tracking
+- **Performance**: 12-20s (3-4 agent calls with 3-6s each)
+- **Requirements**: llama.cpp servers running (ports 9091-9094)
+
+**Example**:
+```python
+generate_prompt(
+    template_name="image_sdxl",
+    variables={
+        "subject": "dragon",
+        "style": "fantasy",
+        "reference_image": "/path/to/ref.png"
+    },
+    mode=PromptMode.AGENT_ASSISTED
+)
+# → Enhanced prompt with visual details from reference image
+# + agent_lineage: ["agent_vision", "agent_logic", "agent_dialog"]
+```
+
+### Agent-Assisted Pipeline Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   AGENT-ASSISTED PIPELINE                    │
+└─────────────────────────────────────────────────────────────┘
+
+   User Input                    Optional Reference Image
+       ↓                                  ↓
+   Template Name              ┌──────────────────────┐
+   + Variables                │   agent_vision       │
+       ↓                      │   (gemma-3-12b)      │
+       ↓                      │   → Image analysis   │
+       ↓                      └──────────┬───────────┘
+       ↓                                 ↓
+       └─────────────────────────────────┘
+                         ↓
+              ┌──────────────────────┐
+              │   agent_logic        │
+              │   (gemma-3n-e4b)     │
+              │   → Structured draft │
+              └──────────┬───────────┘
+                         ↓
+              ┌──────────────────────┐
+              │   agent_dialog       │
+              │   (discopop-zephyr)  │
+              │   → Fluency polish   │
+              └──────────┬───────────┘
+                         ↓
+              ┌──────────────────────┐
+              │   agent_fast         │
+              │   (lfm2-1.2b)        │
+              │   → Keywords/tags    │
+              └──────────┬───────────┘
+                         ↓
+                  Final Prompt
+                  + Keywords
+                  + Negative Prompt
+                  + Agent Lineage
+
+    ╔════════════════════════════════════╗
+    ║  FALLBACK POLICY                   ║
+    ║  - Any agent timeout (>20s)        ║
+    ║  - Any agent unavailable           ║
+    ║  → Auto-switch to TEMPLATE_ONLY    ║
+    ╚════════════════════════════════════╝
+```
+
+### Fallback Behavior
+
+**Timeout Guards**: Each agent call has 20s timeout. If exceeded:
+- System falls back to TEMPLATE_ONLY mode
+- User receives notification: "Offline AI unavailable — using template-only mode"
+
+**Partial Failures**:
+- Vision agent fails → continue with empty vision context
+- Logic agent fails → fallback to TEMPLATE_ONLY
+- Dialog agent fails → return unpolished draft
+
+**Health Monitoring**: `/api/prompts/health` endpoint checks agent availability:
+- **4/4 agents online** → recommend AGENT_ASSISTED
+- **<3 agents online** → recommend TEMPLATE_ONLY
+
+### Multimodal Support (Reference Images)
+
+When user provides a `reference_image`:
+
+1. **agent_vision** analyzes the image (multimodal gemma-3-12b)
+2. Extracts: subject, composition, style, lighting, mood
+3. Feeds analysis into **agent_logic** as additional context
+4. Result: Prompts informed by visual reference
+
+**Use Cases**:
+- Upload existing artwork → generate similar prompt
+- Reverse-engineer prompts from images
+- Style matching: "Generate prompt for this art style"
+
+### API Endpoints (STEP 8)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/prompts/generate` | POST | Generate prompt (TEMPLATE_ONLY or AGENT_ASSISTED) |
+| `/api/prompts/polish` | POST | Polish draft with agent_dialog |
+| `/api/prompts/variants` | POST | Generate 3 prompt variants |
+| `/api/prompts/save` | POST | Save prompt artifact with lineage |
+| `/api/prompts/health` | GET | Check agent availability + mode recommendation |
+
+### Artifact Storage
+
+Prompts are persisted to `Work/prompts/<session_id>.json`:
+
+```json
+{
+  "session_id": "abc123",
+  "timestamp": "2025-10-23T12:34:56Z",
+  "mode": "agent_assisted",
+  "template": "image_sdxl",
+  "prompt": "...",
+  "negative_prompt": "...",
+  "variables": {...},
+  "agent_lineage": ["agent_vision", "agent_logic", "agent_dialog"],
+  "reference_image": "/path/to/ref.png",
+  "reference_image_hash": "a1b2c3d4e5f6..."
+}
+```
+
+### Performance Characteristics
+
+| Mode | Latency | Offline | Quality |
+|------|---------|---------|---------|
+| TEMPLATE_ONLY | <10ms | ✅ Always | Good (deterministic) |
+| AGENT_ASSISTED | 12-20s | ⚠️ Requires agents | Excellent (AI-enhanced) |
+
+### Token Limits
+
+Derived from agent context sizes:
+
+- **agent_vision**: 32K tokens (multimodal)
+- **agent_dialog**: 8K tokens (fluency)
+- **agent_logic**: 16K tokens (reasoning)
+- **agent_fast**: 4K tokens (quick tasks)
+
+Input prompts are truncated to 512 tokens max to stay within limits.
+
+---
+
+## STEP 7: LLM Agent Roles and Routing
 
 ### Agent Overview
 

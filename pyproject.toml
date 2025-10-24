@@ -127,6 +127,7 @@ markers = [
     "integration: Integration tests (may require external tools)",
     "slow: Slow tests (media processing, large files)",
     "gpu: Tests requiring GPU (skip on CPU-only systems)",
+    "asyncio: Async tests requiring event loop",
 ]
 
 [tool.coverage.run]

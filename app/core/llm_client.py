@@ -17,6 +17,10 @@ from loguru import logger
 _SERVERS_CONFIG_PATH = Path(__file__).parent / "llm_servers.yaml"
 _REGISTRY_CONFIG_PATH = Path(__file__).parent / "llm_registry.yaml"
 
+# Global config cache
+_SERVERS: dict | None = None
+_REGISTRY: dict | None = None
+
 
 class LLMClientError(Exception):
     """Base exception for LLM client errors"""
@@ -56,14 +60,10 @@ def load_registry_config() -> dict:
     return _REGISTRY
 
 
-# Global configs
-_SERVERS = load_servers_config()
-_REGISTRY = load_registry_config()
-
-
 def get_server_url(agent_id: str) -> str:
     """Get base URL for agent server"""
-    server_config = _SERVERS.get("servers", {}).get(agent_id)
+    servers = load_servers_config()
+    server_config = servers.get("servers", {}).get(agent_id)
     if not server_config:
         raise LLMClientError(f"Server config not found for agent: {agent_id}")
 
@@ -72,7 +72,8 @@ def get_server_url(agent_id: str) -> str:
 
 def get_server_timeout(agent_id: str) -> int:
     """Get timeout for agent server (in seconds)"""
-    server_config = _SERVERS.get("servers", {}).get(agent_id, {})
+    servers = load_servers_config()
+    server_config = servers.get("servers", {}).get(agent_id, {})
     return server_config.get("timeout", 30)
 
 
@@ -145,8 +146,9 @@ async def chat(
     timeout = get_server_timeout(agent_id)
 
     # Get agent defaults from registry
-    agent_config = _REGISTRY.get("agents", {}).get(agent_id, {})
-    defaults = _REGISTRY.get("defaults", {})
+    registry = load_registry_config()
+    agent_config = registry.get("agents", {}).get(agent_id, {})
+    defaults = registry.get("defaults", {})
 
     # Build request payload
     payload = {
@@ -213,7 +215,8 @@ async def vision_chat(
         LLMTimeoutError: If request times out
     """
     # Verify agent supports vision
-    agent_config = _REGISTRY.get("agents", {}).get(agent_id, {})
+    registry = load_registry_config()
+    agent_config = registry.get("agents", {}).get(agent_id, {})
     capabilities = agent_config.get("capabilities", [])
 
     if "vision" not in capabilities and "multimodal" not in capabilities:
@@ -223,7 +226,7 @@ async def vision_chat(
     timeout = get_server_timeout(agent_id)
 
     # Build request payload (multipart form data)
-    defaults = _REGISTRY.get("defaults", {})
+    defaults = registry.get("defaults", {})
 
     with image_path.open("rb") as image_file:
         files = {"image": image_file}
@@ -284,7 +287,8 @@ async def chat_with_retry(
     Raises:
         LLMServerUnavailableError: If all retries fail
     """
-    retry_delay = _SERVERS.get("global", {}).get("retry_delay_ms", 1000) / 1000
+    servers = load_servers_config()
+    retry_delay = servers.get("global", {}).get("retry_delay_ms", 1000) / 1000
 
     last_error = None
     for attempt in range(max_retries):
@@ -309,7 +313,8 @@ async def health_all() -> dict[str, dict[str, Any]]:
     Returns:
         dict mapping agent_id to health status dict
     """
-    servers = _SERVERS.get("servers", {})
+    servers_config = load_servers_config()
+    servers = servers_config.get("servers", {})
     results = {}
 
     for agent_id in servers:

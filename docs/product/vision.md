@@ -117,11 +117,36 @@ PODStudio **understands AI metadata, hardware limits, and POD marketplace requir
   - **RED**: <2GB VRAM or missing tools, block unsafe ops
 - **User Messaging**: Clear dialogs with upgrade/workaround guidance
 
-### 6. Prompt Generation (Zero-AI Mode)
-- **Template Engine**: Jinja2-based templates
+### 6. Prompt Generation (Agent-Assisted + Zero-AI Modes) — **STEP 8 ENHANCED**
+
+PODStudio v2 offers **dual-mode prompt generation**:
+
+#### **TEMPLATE_ONLY Mode (Zero-AI)**
+- **How**: Jinja2-based template substitution with variable slots
 - **Platform Support**: SDXL, MidJourney, Suno, ElevenLabs, Kling, Sora
-- **Variable Substitution**: Theme, style, mood, BPM, camera angles
-- **No LLM Calls**: Fully offline, no API costs
+- **Speed**: <10ms (instant)
+- **Requirements**: None (always works offline)
+- **Use Case**: Fast, deterministic prompts without any AI dependencies
+
+#### **AGENT_ASSISTED Mode (Offline AI)** — **NEW in STEP 8**
+- **How**: Local LLM agents (llama.cpp servers) enhance prompts
+- **Agents**:
+  - **Vision** (gemma-3-12b): Analyze reference images → extract style/composition/mood
+  - **Logic** (gemma-3n-e4b): Draft structured prompts from keywords
+  - **Dialog** (discopop-zephyr-7b): Polish fluency, remove passive voice
+  - **Fast** (lfm2-1.2b): Generate keywords/tags, fallback support
+- **Speed**: 12-20s (multi-agent pipeline)
+- **Requirements**: llama.cpp servers running (CPU-only, no GPU needed)
+- **Multimodal**: Upload reference image → AI describes it → generates matching prompt
+- **Fallback**: Auto-switches to TEMPLATE_ONLY if agents unavailable
+
+#### **Key Benefits of Offline AI**
+1. **Privacy**: All processing on local CPU — no cloud API calls
+2. **Cost**: Zero per-token costs (unlike ChatGPT/Claude APIs)
+3. **Multimodal**: Reference image analysis for style matching
+4. **Always Works**: Automatic fallback to template-only ensures reliability
+
+**Value Proposition**: *"Get AI-enhanced prompts without cloud costs or privacy risks — runs on any CPU."*
 
 ---
 
@@ -157,11 +182,10 @@ PODStudio **understands AI metadata, hardware limits, and POD marketplace requir
 - **Marketplace auto-upload** (manual upload for v1.0)
 - **Advanced video editing** (beyond trim/transcode/upscale)
 - **Audio mixing** (only normalization)
-- **LLM-based prompt refinement** (zero-AI mode only)
 
 ### Future Roadmap (Post-v1.0)
 - **Cloud Mode**: Optional backend for team sync (v1.2)
-- **Batch Prompt Gen**: LLM-powered prompt refinement (v1.3)
+- **GPU-Accelerated Agents**: Optional GPU mode for faster prompts (v1.3)
 - **Marketplace Integrations**: Auto-upload to Gumroad/Etsy (v2.0)
 - **MacOS Port**: Qt cross-platform support (v2.0)
 
