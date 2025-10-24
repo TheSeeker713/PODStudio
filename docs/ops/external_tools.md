@@ -227,6 +227,129 @@ audiowaveform --version
 
 ---
 
+## llama.cpp (Required for STEP 7, Offline LLM Agent Layer)
+
+**Purpose**: CPU-only offline LLM inference for prompt generation and light reasoning
+
+**Status:** Implemented in STEP 7 — 4 agent endpoints using GGUF models
+
+### Installation
+
+1. **Download**: https://github.com/ggerganov/llama.cpp/releases
+   - Windows: `llama-<version>-bin-win-avx2-x64.zip` (AVX2 build for modern CPUs)
+   - Or compile from source with CMake for optimal performance
+2. **Extract**: `C:\llama.cpp\` (or any location)
+3. **Verify binaries exist**:
+   - `llama-server.exe` — HTTP server for model inference
+   - `llama-cli.exe` — Command-line inference (testing)
+   - `llama-quantize.exe` — Model quantization tool
+4. **Add to PATH** (optional):
+   - System Variables → Path → Edit → New
+   - Add: `C:\llama.cpp\`
+
+### CPU-Only Configuration
+
+PODStudio runs all LLM agents on **CPU only** (no GPU required):
+
+**Thread Tuning:**
+- **Ryzen 6800H** (16 threads): Use `--threads 14` (logical cores - 2)
+- **Intel i7-12700H** (20 threads): Use `--threads 18`
+- **General rule**: `--threads <logical_cores - 2>` to leave headroom for OS
+
+**Memory Requirements:**
+- Q4_K_M quantized models: ~2-4 GB RAM per model
+- Recommended: 16 GB+ system RAM for 4 concurrent agents
+- Context length (ctx-size) impacts RAM: 32K tokens ≈ 2-3 GB
+
+**Performance:**
+- Tokens/sec: 15-30 on Ryzen 6800H (Q4 models)
+- Latency: 2-5 seconds for typical prompts (100-200 tokens)
+
+### Example Launch Commands
+
+**Agent 1 (Vision/Reader) — Port 9091:**
+```powershell
+llama-server.exe `
+  --model "J:\Models\LLM-Models-2025\models\gemma\gemma-3-12b-q4_k_m.gguf" `
+  --mmproj "J:\Models\LLM-Models-2025\models\gemma\mmproj-gemma-3-12b-f16.gguf" `
+  --host 127.0.0.1 `
+  --port 9091 `
+  --ctx-size 32768 `
+  --n-gpu-layers 0 `
+  --threads 14 `
+  --n-batch 512 `
+  --timeout 300
+```
+
+**Agent 2 (Dialog/Fluency) — Port 9092:**
+```powershell
+llama-server.exe `
+  --model "J:\Models\LLM-Models-2025\models\zephyr\discopop-zephyr-7b-gemma-q4_k_m.gguf" `
+  --host 127.0.0.1 `
+  --port 9092 `
+  --ctx-size 8192 `
+  --n-gpu-layers 0 `
+  --threads 14 `
+  --n-batch 512 `
+  --timeout 300
+```
+
+**Agent 3 (Logic/Planner) — Port 9093:**
+```powershell
+llama-server.exe `
+  --model "J:\Models\LLM-Models-2025\models\gemma\gemma-3n-e4b-q4_k_m.gguf" `
+  --host 127.0.0.1 `
+  --port 9093 `
+  --ctx-size 16384 `
+  --n-gpu-layers 0 `
+  --threads 14 `
+  --n-batch 512 `
+  --timeout 300
+```
+
+**Agent 4 (Fast/Fallback) — Port 9094:**
+```powershell
+llama-server.exe `
+  --model "J:\Models\LLM-Models-2025\models\liquid\lfm2-1.2b-q8_0.gguf" `
+  --host 127.0.0.1 `
+  --port 9094 `
+  --ctx-size 4096 `
+  --n-gpu-layers 0 `
+  --threads 8 `
+  --n-batch 256 `
+  --timeout 300
+```
+
+### Verification
+
+**Check server health:**
+```powershell
+curl http://127.0.0.1:9091/health
+# Output: {"status":"ok","model":"gemma-3-12b"}
+```
+
+**Test completion:**
+```powershell
+curl http://127.0.0.1:9091/v1/completions `
+  -H "Content-Type: application/json" `
+  -d '{"prompt":"Write a haiku about coding:","max_tokens":50}'
+```
+
+### Troubleshooting
+
+- **"llama-server.exe not found"**: Add to PATH or use absolute path
+- **Port already in use**: Kill existing process or change `--port`
+- **Slow inference**: Reduce `--ctx-size` or increase `--threads`
+- **Model not found**: Verify absolute path to .gguf file exists
+- **mmproj error (Vision agent)**: Ensure multimodal projector file matches model version
+- **Timeout errors**: Increase `--timeout` value for long prompts
+
+### Running All Agents at Startup
+
+See [run_llama_servers.md](run_llama_servers.md) for batch script to launch all 4 agents simultaneously.
+
+---
+
 ## Redis (Optional, Not Used in M3)
 
 **Purpose**: Backend for RQ (task queue alternative to ThreadPoolExecutor)
@@ -277,6 +400,7 @@ REDIS_PORT=6379
 | numpy | 1.24.0+ | ✅ Yes (M3) | Audio processing | ✅ Implemented |
 | Pillow (PIL) | 10.0.0+ | ✅ Yes (M3) | Image processing | ✅ Implemented |
 | **External Binaries** | | | | |
+| llama.cpp | Latest | ✅ Yes (STEP 7) | Offline LLM agents | ✅ Implemented |
 | FFmpeg | 6.0+ | ✅ Yes | Video/audio ops | ✅ Required |
 | ExifTool | 12.50+ | Recommended | EXIF metadata | 🔜 Future |
 | Real-ESRGAN | 0.2.5+ | Optional | GPU upscaling | 🔜 Future |

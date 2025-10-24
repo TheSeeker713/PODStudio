@@ -1,0 +1,71 @@
+# PODStudio LLM Server Endpoints
+# STEP 7 — Static HTTP endpoints for llama.cpp servers
+#
+# Each agent runs on a dedicated port with its own llama-server instance.
+# Start servers using commands in docs/ops/run_llama_servers.md
+
+servers:
+  # Agent 1: Vision/Reader
+  agent_vision:
+    agent_id: agent_vision
+    host: 127.0.0.1
+    port: 9091
+    base_url: http://127.0.0.1:9091
+    endpoints:
+      health: /health
+      completion: /v1/completions
+      chat: /v1/chat/completions
+      embedding: /v1/embeddings
+    timeout: 30  # seconds per request
+    enabled: true
+
+  # Agent 2: Dialog/Fluency
+  agent_dialog:
+    agent_id: agent_dialog
+    host: 127.0.0.1
+    port: 9092
+    base_url: http://127.0.0.1:9092
+    endpoints:
+      health: /health
+      completion: /v1/completions
+      chat: /v1/chat/completions
+      embedding: /v1/embeddings
+    timeout: 30
+    enabled: true
+
+  # Agent 3: Logic/Planner
+  agent_logic:
+    agent_id: agent_logic
+    host: 127.0.0.1
+    port: 9093
+    base_url: http://127.0.0.1:9093
+    endpoints:
+      health: /health
+      completion: /v1/completions
+      chat: /v1/chat/completions
+      embedding: /v1/embeddings
+    timeout: 30
+    enabled: true
+
+  # Agent 4: Fast/Fallback
+  agent_fast:
+    agent_id: agent_fast
+    host: 127.0.0.1
+    port: 9094
+    base_url: http://127.0.0.1:9094
+    endpoints:
+      health: /health
+      completion: /v1/completions
+      chat: /v1/chat/completions
+      embedding: /v1/embeddings
+    timeout: 15  # Faster timeout for quick responses
+    enabled: true
+
+# Global settings
+global:
+  retry_attempts: 3
+  retry_delay_ms: 1000
+  circuit_breaker_threshold: 5  # Failures before marking server down
+  circuit_breaker_timeout_seconds: 60  # Time before retry
+  request_timeout_seconds: 30
+  max_concurrent_requests: 10

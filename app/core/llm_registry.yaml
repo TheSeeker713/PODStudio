@@ -1,0 +1,115 @@
+# PODStudio LLM Agent Registry
+# STEP 7 — Offline GGUF models via llama.cpp (CPU-only)
+#
+# All models are pre-installed locally at:
+# J:\Models\LLM-Models-2025\models\
+
+agents:
+  # Agent 1: Vision/Reader — Multimodal capabilities for image analysis
+  agent_vision:
+    id: agent_vision
+    purpose: "Vision and multimodal understanding (image captions, visual descriptions)"
+    model_name: "google/gemma-3-12b"
+    model_path: "J:\\Models\\LLM-Models-2025\\models\\gemma\\gemma-3-12b-q4_k_m.gguf"
+    mmproj_path: "J:\\Models\\LLM-Models-2025\\models\\gemma\\mmproj-gemma-3-12b-f16.gguf"
+    quantization: "Q4_K_M"
+    ctx_len: 32768
+    n_threads: 14  # Ryzen 6800H: 16 threads - 2
+    n_batch: 512
+    n_gpu_layers: 0  # CPU-only
+    draft_model: null
+    temperature: 0.7
+    top_p: 0.9
+    capabilities:
+      - vision
+      - multimodal
+      - reading
+      - description
+
+  # Agent 2: Dialog/Fluency — Natural language polish and fluency
+  agent_dialog:
+    id: agent_dialog
+    purpose: "Dialog and fluency polishing (prompt refinement, natural language)"
+    model_name: "discopop-zephyr-7b-gemma"
+    model_path: "J:\\Models\\LLM-Models-2025\\models\\zephyr\\discopop-zephyr-7b-gemma-q4_k_m.gguf"
+    mmproj_path: null
+    quantization: "Q4_K_M"
+    ctx_len: 8192
+    n_threads: 14
+    n_batch: 512
+    n_gpu_layers: 0
+    draft_model: null
+    temperature: 0.8
+    top_p: 0.95
+    capabilities:
+      - dialog
+      - fluency
+      - polish
+      - creative_writing
+
+  # Agent 3: Logic/Planner — Reasoning and structured planning
+  agent_logic:
+    id: agent_logic
+    purpose: "Logic and planning (prompt drafting, reasoning, structure)"
+    model_name: "google/gemma-3n-e4b"
+    model_path: "J:\\Models\\LLM-Models-2025\\models\\gemma\\gemma-3n-e4b-q4_k_m.gguf"
+    mmproj_path: null
+    quantization: "Q4_K_M"
+    ctx_len: 16384
+    n_threads: 14
+    n_batch: 512
+    n_gpu_layers: 0
+    draft_model: null
+    temperature: 0.6
+    top_p: 0.85
+    capabilities:
+      - logic
+      - planning
+      - reasoning
+      - drafting
+
+  # Agent 4: Fast/Fallback — Quick responses and fallback
+  agent_fast:
+    id: agent_fast
+    purpose: "Fast responses and fallback (summaries, keywords, quick tasks)"
+    model_name: "liquid/lfm2-1.2b"
+    model_path: "J:\\Models\\LLM-Models-2025\\models\\liquid\\lfm2-1.2b-q8_0.gguf"
+    mmproj_path: null
+    quantization: "Q8_0"
+    ctx_len: 4096
+    n_threads: 8  # Smaller model, fewer threads
+    n_batch: 256
+    n_gpu_layers: 0
+    draft_model: null
+    temperature: 0.5
+    top_p: 0.8
+    capabilities:
+      - fast
+      - summary
+      - keywords
+      - fallback
+
+# Hardware profiles for different CPU types
+hardware_profiles:
+  ryzen_6800h:
+    logical_cores: 16
+    recommended_threads: 14  # cores - 2
+    ram_gb: 32
+
+  intel_i7_12700h:
+    logical_cores: 20
+    recommended_threads: 18
+    ram_gb: 16
+
+  intel_i5_generic:
+    logical_cores: 12
+    recommended_threads: 10
+    ram_gb: 16
+
+# Global defaults (can be overridden per agent)
+defaults:
+  timeout_seconds: 300
+  max_tokens: 512
+  stop_sequences: ["</s>", "<|im_end|>", "<|endoftext|>"]
+  retry_attempts: 3
+  retry_delay_ms: 1000

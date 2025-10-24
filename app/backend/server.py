@@ -11,7 +11,7 @@ To run:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.backend.routes import health, jobs, probe
+from app.backend.routes import health, jobs, llm, probe
 from app.core.db import create_db_and_tables
 from app.core.logging import get_logger
 
@@ -49,6 +49,7 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(probe.router, prefix="/api", tags=["probe"])
 app.include_router(jobs.router, prefix="/api", tags=["jobs"])
+app.include_router(llm.router)  # LLM routes have /api/llm prefix built-in
 
 
 @app.get("/")
